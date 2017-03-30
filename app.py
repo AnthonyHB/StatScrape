@@ -3,12 +3,14 @@ Clear Sky Capital - Car Wash Projections via StatWatch
 by AnthonyHB
 
 Input: Dynamic data from StatWatch
-Process: ( Monthly Sales (or Car count) / Day of Month ) * Days in Month
+Process: ( Monthly Sales (and Car count) / Day of Month ) * Days in Month
 Output: Projected Montly Sales & Show Projected Monthly Car Count
 """
 
 from bs4 import BeautifulSoup as bsoup
 import requests as rq
+import datetime as dt
+import calendar as cd
 
 password = input("Please enter the password:")
 
@@ -20,9 +22,10 @@ payload = {
 }
 
 # Today's date
-mon = 3
-days = 29
-daysIM = 31
+now = dt.datetime.now()
+mon = now.month
+days = now.day 
+daysIM = cd.monthrange(now.year, now.month)[1]
 
 # Monthly Sales Session - Use 'with' to ensure the session context is closed after use.
 with rq.Session() as s:
