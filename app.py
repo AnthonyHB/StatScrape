@@ -39,26 +39,25 @@ with rq.Session() as s:
 
 # Parse HTML data 
 soup = bsoup(r.content, "lxml")
-divTag = soup.find_all("div", {"data-trayid": "totalsales"})
+site = "01A"
 
-# Monthly Sales totals
-for tag in divTag:
-    liTags = tag.find_all("li", attrs={"data-site": "01A"})
-    for tag in liTags:
+# Monthly Sales Total
+divSales = soup.find_all("div", {"data-trayid": "totalsales"})
+for div in divSales:
+    liSales = div.find_all("li", attrs={"data-site": site})
+    for li in liSales:
         # Remove commas from monSales, and convert to int
-        num = tag.get_text().replace(',', '')
+        num = li.get_text().replace(',', '')
         monSales = int(num.replace('$',''))
         salesProj = ( monSales / days ) * daysIM
-        print("01A Projected Sales: ${:,}".format(round(salesProj)) + ". Monthly Sales to Date: ${:,}".format(round(monSales)) + ".") 
-
-divTag = soup.find_all("div", {"data-trayid": "total"})
-
-# Monthly Cars totals
-for tag in divTag:
-    liTags = tag.find_all("li", attrs={"data-site": "01A"})
-    for tag in liTags:
-        # Remove commas, and convert to int
-        monCars = int(tag.get_text().replace(',', ''))
+        print(site + " Monthly Sales to Date: ${:,}".format(round(monSales)) + "." + "Projected Sales: ${:,}".format(round(salesProj))) 
+        
+# Monthly Cars Total
+divCount = soup.find_all("div", {"data-trayid": "total"})
+for div in divCount:
+    liCount = div.find_all("li", attrs={"data-site": site})
+    for li in liCount:
+        monCars = int(li.get_text().replace(',', ''))
         carsProj = ( monCars / days ) * daysIM
-        print("01A Projected Car Count: {:,}".format(round(carsProj)) + ". Monthly Car Count to Date: {:,}".format(monCars) + ".") 
+        print(site + " Monthly Car Count to Date: {:,}".format(monCars) + "." + "Projected Car Count: {:,}".format(round(carsProj))) 
         
