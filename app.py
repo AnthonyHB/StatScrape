@@ -1,25 +1,61 @@
+"""
+Clear Sky Capital - Car Wash Projections via StatWatch
+by AnthonyHB
+
+Input: Dynamic data from StatWatch
+Process: ( Monthly Sales (or Car count) / Day of Month ) * Days in Month
+Output: Projected Montly Sales & Show Projected Monthly Car Count
+"""
+
 from bs4 import BeautifulSoup as bsoup
 import requests as rq
 
-# Fill in your details here to be posted to the login form.
+password = input("Please enter the password:")
+
+# Login Form for StatWatch
 payload = {
     'username': 'ant',
-    'password': 'lp14',
+    'password': password,
     'chain': 'scttaz'
 }
 
-# Use 'with' to ensure the session context is closed after use.
+# Today's date
+mon = 3
+days = 29
+daysIM = 31
+
+# Monthly Sales Session - Use 'with' to ensure the session context is closed after use.
 with rq.Session() as s:
     p = s.post('https://www.statwatch.com/login', data=payload)
-    # print the html returned or something more intelligent to see if it's a successful login page.
 
-    # The authorized request
-    cMonth = "3"
-    url1 = "https://www.statwatch.com/ajax/multi-site-table?groupID=all&compareSiteID=PREV&sort=site&sortd=asc&pc=0&activeStat=total&start="
-    url2 = "/1/2017&granularity=6&todate=1&difftype=percentup&unittype=abs"
-    r = s.get(url1 + cMonth + url2)
-        
+    # Authorized Request
+    pt1 = "https://www.statwatch.com/ajax/multi-site-table?groupID=all&compareSiteID=PREV&sort=site&sortd=asc&pc=0&activeStat=total&start="
+    pt2 = "/2017&granularity=6&todate=1&difftype=percentup&unittype=abs"
+    url = pt1 + str(mon) + "/" + str(days) + pt2
+    r = s.get(url)
+
+# Parse HTML data 
 soup = bsoup(r.content, "lxml")
-divs = soup.find_all("div", { "data-trayid" : "total" })
-for div in divs:
-    print(div.get_text())
+divTag = soup.find_all("div", {"data-trayid": "totalsales"})
+
+# Monthly Sales totals
+for tag in divTag:
+    liTags = tag.find_all("li", attrs={"data-site": "01A"})
+    for tag in liTags:
+        # Remove commas from monSales, and convert to int
+        num = tag.get_text().replace(',', '')
+        monSales = int(num.replace('$',''))
+        salesProj = ( monSales / days ) * daysIM
+        print("01A Projected Sales: ${:,}".format(round(salesProj)) + ". Monthly Sales to Date: ${:,}".format(round(monSales)) + ".") 
+
+divTag = soup.find_all("div", {"data-trayid": "total"})
+
+# Monthly Cars totals
+for tag in divTag:
+    liTags = tag.find_all("li", attrs={"data-site": "01A"})
+    for tag in liTags:
+        # Remove commas, and convert to int
+        monCars = int(tag.get_text().replace(',', ''))
+        carsProj = ( monCars / days ) * daysIM
+        print("01A Projected Car Count: {:,}".format(round(carsProj)) + ". Monthly Car Count to Date: {:,}".format(monCars) + ".") 
+        
