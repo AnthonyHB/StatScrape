@@ -9,6 +9,7 @@ Output: Projected Montly Sales & Show Projected Monthly Car Count
 
 from bs4 import BeautifulSoup as bsoup
 import calendar as cd
+import csv
 import datetime as dt
 import requests as rq
 
@@ -50,8 +51,11 @@ for div in divSites:
         sites.append(li.get_text())
 
 # Find Sales and Car Count by Site
-data = []
-num = 0
+data = [
+    ['Site', 'Monthly Sales', 'Projected Sales', 'Monthly Cars', 'Projected Cars']
+]
+
+num = 1
 for site in sites:
     # Monthly Sales Total
     divSales = soup.find_all("div", {"data-trayid": "totalsales"})
@@ -76,4 +80,7 @@ for site in sites:
             data[num].append("{:,}".format(round(carsProj)))
             num = num + 1 
 
-print(data)
+# Save Data to CSV
+with open("output.csv", 'w') as resultFile:
+    wr = csv.writer(resultFile, dialect='excel')
+    wr.writerows(data)
