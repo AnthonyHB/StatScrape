@@ -12,7 +12,7 @@ import calendar as cd
 import datetime as dt
 import requests as rq
 
-password = input("Please enter the password:")
+password = input("Please enter password:")
 
 # Login Form for StatWatch
 payload = {
@@ -27,6 +27,7 @@ today = now.day
 date = dt.datetime.today().strftime("%m/%d/%Y")
 daysIM = cd.monthrange(now.year, now.month)[1]
 
+
 # SiteWatch Session - Use 'with' to ensure the session context is closed after use.
 with rq.Session() as s:
     p = s.post('https://www.statwatch.com/login', data=payload)
@@ -38,10 +39,10 @@ with rq.Session() as s:
     r = s.get(url)
     
 # HTML data 
-soup = bsoup(r.content, "lxml")
-
-# Turn all sites into an array
+# Pass all sites into one array
+soup = bsoup(r.content, "lxml") 
 sites = []
+
 divSites = soup.find_all("div", {"data-trayid": "site"})
 for div in divSites:
     liSites = div.find_all("li")
@@ -49,26 +50,30 @@ for div in divSites:
         sites.append(li.get_text())
 
 # Find Sales and Car Count by Site
+data = []
+num = 0
 for site in sites:
-
     # Monthly Sales Total
     divSales = soup.find_all("div", {"data-trayid": "totalsales"})
     for div in divSales:
         liSales = div.find_all("li", attrs={"data-site": site})
         for li in liSales:
-            # Remove $ and comma from monSales, and convert to int
-            salesMonth = int(li.get_text().replace('$', '').replace(',',''))
+            salesMonth = int(li.get_text().replace('$', '').replace(',','')) # Convert to int
             salesProj = ( salesMonth / today ) * daysIM
-            print(site + " Sales to Date: ${:,}".format(round(salesMonth))) 
-            print(site + " Sales Projected: ${:,}".format(round(salesProj)))
+            data.append([])
+            data[num].append(site)
+            data[num].append("${:,}".format(round(salesMonth))) 
+            data[num].append("${:,}".format(round(salesProj)))
 
     # Monthly Cars Total
     divCount = soup.find_all("div", {"data-trayid": "total"})
     for div in divCount:
         liCount = div.find_all("li", attrs={"data-site": site})
         for li in liCount:
-            # Remove comma from monCars, and convert to int
-            carsMonth = int(li.get_text().replace(',', ''))
+            carsMonth = int(li.get_text().replace(',', '')) # Convert to int
             carsProj = ( carsMonth / today ) * daysIM
-            print(site + " Car Count to Date: {:,}".format(carsMonth))
-            print(site + " Car Count Projected: {:,}".format(round(carsProj))) 
+            data[num].append("{:,}".format(carsMonth))
+            data[num].append("{:,}".format(round(carsProj)))
+            num = num + 1 
+
+print(data)
