@@ -12,8 +12,6 @@ import calendar as cd
 import datetime as dt
 import requests as rq
 
-
-
 password = input("Please enter the password:")
 
 # Login Form for StatWatch
@@ -25,21 +23,21 @@ payload = {
 
 # Today's date
 now = dt.datetime.now()
-mon = now.month
-days = now.day 
+today = now.day 
+date = dt.datetime.today().strftime("%m/%d/%Y")
 daysIM = cd.monthrange(now.year, now.month)[1]
 
-# Monthly Sales Session - Use 'with' to ensure the session context is closed after use.
+# SiteWatch Session - Use 'with' to ensure the session context is closed after use.
 with rq.Session() as s:
     p = s.post('https://www.statwatch.com/login', data=payload)
 
     # Authorized Request
     pt1 = "https://www.statwatch.com/ajax/multi-site-table?groupID=all&compareSiteID=PREV&sort=site&sortd=asc&pc=0&activeStat=total&start="
-    pt2 = "/2017&granularity=6&todate=1&difftype=percentup&unittype=abs"
-    url = pt1 + str(mon) + "/" + str(days) + pt2
+    pt2 = "&granularity=6&todate=1&difftype=percentup&unittype=abs"
+    url = pt1 + date + pt2
     r = s.get(url)
-
-# Parse HTML data 
+    
+# HTML data 
 soup = bsoup(r.content, "lxml")
 
 # Turn all sites into an array
@@ -50,6 +48,7 @@ for div in divSites:
     for li in liSites:
         sites.append(li.get_text())
 
+# Find Sales and Car Count by Site
 for site in sites:
 
     # Monthly Sales Total
@@ -58,10 +57,10 @@ for site in sites:
         liSales = div.find_all("li", attrs={"data-site": site})
         for li in liSales:
             # Remove $ and comma from monSales, and convert to int
-            monSales = int(li.get_text().replace('$', '').replace(',',''))
-            projSales = ( monSales / days ) * daysIM
-            print(site + " Sales to Date: ${:,}".format(round(monSales))) 
-            print(site + " Projected Sales: ${:,}".format(round(projSales)))
+            salesMonth = int(li.get_text().replace('$', '').replace(',',''))
+            salesProj = ( salesMonth / today ) * daysIM
+            print(site + " Sales to Date: ${:,}".format(round(salesMonth))) 
+            print(site + " Sales Projected: ${:,}".format(round(salesProj)))
 
     # Monthly Cars Total
     divCount = soup.find_all("div", {"data-trayid": "total"})
@@ -69,8 +68,7 @@ for site in sites:
         liCount = div.find_all("li", attrs={"data-site": site})
         for li in liCount:
             # Remove comma from monCars, and convert to int
-            monCars = int(li.get_text().replace(',', ''))
-            projCars = ( monCars / days ) * daysIM
-            print(site + " Car Count to Date: {:,}".format(monCars))
-            print(site + " Projected Car Count: {:,}".format(round(projCars))) 
-        
+            carsMonth = int(li.get_text().replace(',', ''))
+            carsProj = ( carsMonth / today ) * daysIM
+            print(site + " Car Count to Date: {:,}".format(carsMonth))
+            print(site + " Car Count Projected: {:,}".format(round(carsProj))) 
