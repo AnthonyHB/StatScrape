@@ -8,10 +8,13 @@ Output: Projected Montly Sales & Show Projected Monthly Car Count
 """
 
 from bs4 import BeautifulSoup as bsoup
+from email.mime.text import MIMEText
 import calendar as cd
 import csv
 import datetime as dt
 import requests as rq
+import xlwt
+import smtplib
 
 password = input("Please enter password:")
 
@@ -26,6 +29,7 @@ payload = {
 now = dt.datetime.now()
 today = now.day 
 date = dt.datetime.today().strftime("%m/%d/%Y")
+dateName = dt.datetime.today().strftime("%m-%d-%Y")
 daysIM = cd.monthrange(now.year, now.month)[1]
 
 
@@ -89,7 +93,51 @@ for site in sites:
             data[num].append("{:,}".format(round(carsP))) 
             num = num + 1
 
-# Save Data to CSV
+# Save Data to XLS
+book = xlwt.Workbook()
+sheet = book.add_sheet("Data")
+
+sheet.col(0).width = 256 * 42
+
+for i, l in enumerate(data):
+    for j, col in enumerate(l):
+        sheet.write(i, j, col)
+
+book.save(str("Projections " + dateName + ".xls"))
+
+"""
+# Under Construction / If Needed
+# Save Data to CSV (If needed)
 with open("output.csv", 'w') as resultFile:
     wr = csv.writer(resultFile, dialect='excel')
     wr.writerows(data)
+
+# Send Email
+SMTP_SERVER = "smtp.office365.com"
+SMTP_PORT = 443
+SMTP_USERNAME = "anthony@clearskycapitalinc.com"
+SMTP_PASSWORD = "Yopo3185"
+
+EMAIL_TO = ["anthony@clearskycapitalinc.com"]
+EMAIL_FROM = "anthony@clearskycapitalinc.com"
+EMAIL_SUBJECT = "Demo Email : "
+
+DATE_FORMAT = "%d/%m/%Y"
+EMAIL_SPACE = ", "
+
+DATA='This is the content of the email.'
+
+def send_email():
+    msg = MIMEText(DATA)
+    msg['Subject'] = EMAIL_SUBJECT + " %s" % (date)
+    msg['To'] = EMAIL_SPACE.join(EMAIL_TO)
+    msg['From'] = EMAIL_FROM
+    mail = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    mail.starttls()
+    mail.login(SMTP_USERNAME, SMTP_PASSWORD)
+    mail.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
+    mail.quit()
+
+if __name__=='__main__':
+    send_email()
+"""

@@ -1,2 +1,2 @@
 # StatScrape
-Web scraper for dynamic data from StatWatch
+Web scraper for dynamic sales data from StatWatch
