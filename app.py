@@ -40,9 +40,14 @@ with rq.Session() as s:
     r = s.get(url)
     
 # HTML data 
-# Pass all sites into one array
+# Set up arrays for sites and data
 soup = bsoup(r.content, "lxml") 
+data = [
+    ['Site', 'Monthly Sales', 'Projected Sales', 'Monthly Cars', 'Projected Cars']
+]
 sites = []
+siteName = ''
+num = 1
 
 divSites = soup.find_all("div", {"data-trayid": "site"})
 for div in divSites:
@@ -51,34 +56,39 @@ for div in divSites:
         sites.append(li.get_text())
 
 # Find Sales and Car Count by Site
-data = [
-    ['Site', 'Monthly Sales', 'Projected Sales', 'Monthly Cars', 'Projected Cars']
-]
-
-num = 1
 for site in sites:
+
+    # Site Name Lookup
+    divNames = soup.find_all("div", {"data-trayid": "site"})
+    for div in divNames:
+        liNames = div.find_all("li", attrs={"data-site": site})
+        for li in liNames:
+            siteName = str(li.find('a', {'rel': True}).get('rel'))
+            print(siteName)
+
     # Monthly Sales Total
     divSales = soup.find_all("div", {"data-trayid": "totalsales"})
     for div in divSales:
         liSales = div.find_all("li", attrs={"data-site": site})
         for li in liSales:
-            salesMonth = int(li.get_text().replace('$', '').replace(',','')) # Convert to int
-            salesProj = ( salesMonth / today ) * daysIM
+            salesM = int(li.get_text().replace('$', '').replace(',','')) # Convert to int
+            salesP = ( salesM / today ) * daysIM
             data.append([])
-            data[num].append(site)
-            data[num].append("${:,}".format(round(salesMonth))) 
-            data[num].append("${:,}".format(round(salesProj)))
+            data[num].append(siteName)
+            data[num].append("${:,}".format(round(salesM))) 
+            data[num].append("${:,}".format(round(salesP)))
 
     # Monthly Cars Total
     divCount = soup.find_all("div", {"data-trayid": "total"})
+
     for div in divCount:
         liCount = div.find_all("li", attrs={"data-site": site})
         for li in liCount:
-            carsMonth = int(li.get_text().replace(',', '')) # Convert to int
-            carsProj = ( carsMonth / today ) * daysIM
-            data[num].append("{:,}".format(carsMonth))
-            data[num].append("{:,}".format(round(carsProj)))
-            num = num + 1 
+            carsM = int(li.get_text().replace(',', '')) # Convert to int
+            carsP = ( carsM / today ) * daysIM
+            data[num].append("{:,}".format(carsM))
+            data[num].append("{:,}".format(round(carsP))) 
+            num = num + 1
 
 # Save Data to CSV
 with open("output.csv", 'w') as resultFile:
