@@ -115,11 +115,11 @@ with open("output.csv", 'w') as resultFile:
 # Send Email
 SMTP_SERVER = "smtp.office365.com"
 SMTP_PORT = 443
-SMTP_USERNAME = "anthony@clearskycapitalinc.com"
-SMTP_PASSWORD = "Yopo3185"
+SMTP_USERNAME = emailusername
+SMTP_PASSWORD = emailpassword
 
-EMAIL_TO = ["anthony@clearskycapitalinc.com"]
-EMAIL_FROM = "anthony@clearskycapitalinc.com"
+EMAIL_TO = [emailusername]
+EMAIL_FROM = emailusername
 EMAIL_SUBJECT = "Demo Email : "
 
 DATE_FORMAT = "%d/%m/%Y"
