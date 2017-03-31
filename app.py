@@ -43,7 +43,7 @@ with rq.Session() as s:
 # Set up arrays for sites and data
 soup = bsoup(r.content, "lxml") 
 data = [
-    ['Site', 'Monthly Sales', 'Projected Sales', 'Monthly Cars', 'Projected Cars']
+    ['Location', 'Month Sales', 'Projected', 'Month Cars', 'Projected']
 ]
 sites = []
 siteName = ''
@@ -63,8 +63,7 @@ for site in sites:
     for div in divNames:
         liNames = div.find_all("li", attrs={"data-site": site})
         for li in liNames:
-            siteName = str(li.find('a', {'rel': True}).get('rel'))
-            print(siteName)
+            siteName = str(' '.join(li.find('a', {'rel': True}).get('rel')))
 
     # Monthly Sales Total
     divSales = soup.find_all("div", {"data-trayid": "totalsales"})
