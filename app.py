@@ -1,12 +1,3 @@
-"""
-Clear Sky Capital - Car Wash Projections via StatWatch
-by AnthonyHB
-
-Input: Dynamic data from StatWatch
-Process: ( Monthly Sales (and Car count) / Day of Month ) * Days in Month
-Output: Projected Montly Sales & Show Projected Monthly Car Count
-"""
-
 from bs4 import BeautifulSoup as bsoup
 from email.mime.text import MIMEText
 import calendar as cd
@@ -106,7 +97,7 @@ for i, l in enumerate(data):
 book.save(str("Projections " + dateName + ".xls"))
 
 """
-# Under Construction / If Needed
+# Under Construction 
 # Save Data to CSV (If needed)
 with open("output.csv", 'w') as resultFile:
     wr = csv.writer(resultFile, dialect='excel')
