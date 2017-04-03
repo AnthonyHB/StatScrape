@@ -1,22 +1,18 @@
 # StatScrape
 Web scraper for dynamic sales data from StatWatch
 
-Clear Sky Capital - Company Projections via StatWatch
+Company Projections
 by AnthonyHB
 
 What does this program need?
 - Dynamic data from StatWatch (e.g. Locations, Sales, Customers)
 
 How does this program work?
-
-- Scrape Monthly Sales and Customers for each location,
+- Scrape MTD Sales/Customer data for each location,
 - Calculate Projected Sales and Customers for each location 
-- Create and save XLS with all data. 
+- Compare Projected data to Company goals.
+- Create XLS, email spreadsheet and Goal Summary.
 
-What does this program do?
-- Create Projections XLS Sheet, based on today's StatWatch data.  
-
-Hopes for the future:
-- Develop email functionality, to send projections to recipients.
-- Automate Program weekly; Run report, and send email. 
-- 
+Need to do:
+- Goal summary as an HTML table in email body
+- Automate program to run weekly; Run report, calculate projections, and send email. 
