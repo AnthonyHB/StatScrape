@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup as bsoup
 import calendar as cd
 import datetime as dt
 import requests as rq
-import xlwt
 import smtplib
+import xlwt
 
-password = input("Please enter password:")
+password = input("Please enter password: ")
 
 # Login Form for StatWatch
 payload = {
@@ -24,7 +24,6 @@ date = dt.datetime.today().strftime("%m/%d/%Y")
 dateName = dt.datetime.today().strftime("%m-%d-%Y")
 daysIM = cd.monthrange(now.year, now.month)[1]
 
-
 # SiteWatch Session - Use 'with' to ensure the session context is closed after use.
 with rq.Session() as s:
     p = s.post('https://www.statwatch.com/login', data=payload)
@@ -38,12 +37,11 @@ with rq.Session() as s:
 # HTML data 
 # Set up arrays for sites and data
 soup = bsoup(r.content, "lxml") 
+sites = []
+siteName = ''
 data = [
     ['Location', 'Month Sales', 'Projected', 'Goal', 'Percent', 'Month Cars', 'Projected', 'Goal', 'Percent']
 ]
-sites = []
-siteName = ''
-num = 1
 
 salesTA = 0
 salesPA = 0
@@ -51,6 +49,7 @@ salesGA = 0
 carsTA = 0
 carsPA = 0
 carsGA = 0
+num = 1
 
 divSites = soup.find_all("div", {"data-trayid": "site"})
 for div in divSites:
@@ -81,9 +80,9 @@ for site in sites:
                 p = ( y / z ) * 100
             else:
                 p = 0
-            salesT = "${:,}".format(round(x))
-            salesP = "${:,}".format(round(y))
-            salesG = "${:,}".format(round(z))
+            salesT = round(x)
+            salesP = round(y)
+            salesG = round(z)
             salesGP = "{:,}".format(round(p))
             salesTA = salesTA + x
             salesPA = salesPA + y
@@ -109,9 +108,9 @@ for site in sites:
                 p = ( y / z ) * 100
             else:
                 p = 0
-            carsT = "{:,}".format(round(x))
-            carsP = "{:,}".format(round(y))
-            carsG = "{:,}".format(round(z))
+            carsT = round(x)
+            carsP = round(y)
+            carsG = round(z)
             carsGP = "{:,}".format(round(p))
             carsTA = carsTA + x
             carsPA = carsPA + y
@@ -159,26 +158,19 @@ book.save(filename)
 # Send Email
 def send_email():
     myEmail = 'anthony@clearskycapitalinc.com'
-    myPassword = input('Email password')
+    myPassword = input('Email password: ')
     tim = 'tim@clearskycapitalinc.com'
 
     # Email details
     msgTo = myEmail
     msgFrom = myEmail
     msg = MIMEMultipart()
-    bodyText = """ Hey Tim,
-
-This is a code-generated email. It's not perfect, but it's an early draft on how to compare Projections/Goals. 
-
-I still need to adjust this code to read the actual goals. I don't have Mike's data yet to fill that in. For now, 'Goals' is only being copied from what's being projected, so they're all 100 percent. 
-
-I'm also attaching the spreadsheet to test these emails, but I can write all the store data on the email body too. However, the projections are an accurate total for all stores. Let me know what you think!
-
-- Algo
-
-Hello,
+    bodyText = """Hello,
 
 Here are the projections and goals for all locations as of {0}. Please see attached spreadhseet for a breakdown of these totals. 
+
+"""
+    bodyTable = """
 
 Sales Total:    {1}
 Projection:     {2}
@@ -190,9 +182,6 @@ Projection:     {6}
 Goal:               {7}
 Goal Projected: {8}%
 
-Thank you,
-
-Anthony Benites
 """
     body = MIMEText(bodyText.format(date, salesTA, salesPA, salesGA, salesGPA, carsTA, carsPA, carsGA, carsGPA))
     msg.attach(body)
@@ -217,4 +206,3 @@ Anthony Benites
 
 if __name__=='__main__':
     send_email()
-
