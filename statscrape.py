@@ -429,12 +429,7 @@ sheetCA = book.add_sheet("CA")
 sheetNV = book.add_sheet("NV")
 filename = "Projections " + dateName + ".xls"
 
-sheetAllSites.col(0).width = 256 * 42
-sheetLP14.col(0).width = 256 * 42
-sheetLP21.col(0).width = 256 * 42
-sheetAZ.col(0).width = 256 * 42
-sheetCA.col(0).width = 256 * 42
-sheetNV.col(0).width = 256 * 42
+sheetAllSites.col(0).width = sheetLP14.col(0).width = sheetLP21.col(0).width = sheetAZ.col(0).width = sheetCA.col(0).width = sheetNV.col(0).width = 256 * 42
 
 for i, l in enumerate(allSites):
     for j, col in enumerate(l):
