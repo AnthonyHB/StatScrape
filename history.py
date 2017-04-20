@@ -5,14 +5,12 @@ import requests as rq
 import xlwt
 
 history = []
-
 titles = [
             'Date',
             'Location',
             'Month Sales', 
             'Month Cars'
         ]
-
 allDates = [titles]
 
 for x in range(2013, 2018):
