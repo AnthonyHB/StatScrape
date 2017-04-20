@@ -18,7 +18,7 @@ import calendar as cd
 import datetime as dt
 import requests as rq
 from sitedata import data
-from htmlBody import cskyHTML
+from emailhtml import cskyHTML
 import smtplib
 import xlwt
 
