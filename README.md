@@ -1,17 +1,21 @@
 # StatScrape
-Web scraper for dynamic sales data from StatWatch
+Web scraper for KPI's from StatWatch
 
-Company Projections
+Why StatScrape?
+- Statscrape pulls Sales, Customer, and Labor data from Statwatch in order to create projections, compare to current goals, and update team members automatically.
 
-What does this program need?
-- Dynamic data from StatWatch (e.g. Locations, Sales, Customers)
-
-How does this program work?
-- Scrape MTD Sales/Customer data for each location,
-- Calculate Projected Sales and Customers for each location 
-- Compare Projected data to Company goals.
+How does this StatScrape work?
+- Scrapes MTD and QTD Metrics data for each location,
+- Calculate Projected Metrics for each location 
+- Compare Projected data to current goals.
 - Create XLS with Sheets for Companies and Regions
-- Emails spreadsheet and goal summary to team.
+- Emails Goal Summary to team, with a detailed spreadsheet attached.
 
-Need to do:
-- Automate program to run on monthly schedule; Run report, calculate projections, and send email with spreadsheet. 
+StatScrape supports the following Metrics, current and historical:
+- Sales
+- Customers
+- Labor
+- Weather
+
+The Future for StatScrape:
+- To pull additional metrics as needed, and give the user the ability to easily pick and choose desired functions.
