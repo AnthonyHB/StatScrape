@@ -1,11 +1,8 @@
-"""
-Make Region Email for Mike and Managers
-"""
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from bs4 import BeautifulSoup as bsoup
-from sitedata import qDict
+from sitedata import qDict, payload
 from emailhtml import cskyHTML
 import calendar as cd
 import datetime as dt
@@ -20,25 +17,22 @@ class CarWash(object):
         self.region = info.ix[self.name]['Region']
         self.company = info.ix[self.name]['Company']
         self.address = info.ix[self.name]['Location']
-
     def get_total(self, x):
         if x != '-' and x != '$-':
             total = float(x.replace('$', '').replace(',', '').replace(' %',''))
         else:
             total = 0
         return total
-
     def get_project(self, total, day, daysIM):
         project = ( total / day ) * daysIM
         return project
-
     def get_percent(self, project, goal):
         if project != 0 and goal != 0:
             percent = project / goal
         else:
             percent = 0
         return percent
-
+        
     def scrape_init(self):
         # Pull M1
         with rq.Session() as s:
@@ -409,12 +403,13 @@ def create_workbook():
 
 def send_email(filename):
     # Email details
+    html = cskyHTML.format(**summaries)
     text = """Hello,
     
 Here are the projections and goals for all locations as of {}. Please see attached spreadhseet for a breakdown of these totals. 
 
-"""
-    html = cskyHTML
+""".format(date)
+    
     myEmail = 'anthony@clearskycapitalinc.com'
     myGmail = 'anthony.benites17@gmail.com'
     myPassword = input("password: ")
@@ -427,87 +422,9 @@ Here are the projections and goals for all locations as of {}. Please see attach
 
     test = [myEmail, myGmail]
     real = [tBarrett, aShell, mWong, mGrimes, mCollins, myEmail]
-
     recipients = test
     
     msg = MIMEMultipart()
-
-    text = text.format(date)
-    html = html.format(
-                        summaries['All'].salesTotal, 
-                        summaries['LP14'].salesTotal, 
-                        summaries['LP21'].salesTotal,  
-                        summaries['All'].salesProject, 
-                        summaries['LP14'].salesProject, 
-                        summaries['LP21'].salesProject,  
-                        summaries['All'].salesGoal,  
-                        summaries['LP14'].salesGoal, 
-                        summaries['LP21'].salesGoal, 
-                        summaries['All'].salesPercent,
-                        summaries['LP14'].salesPercent,   
-                        summaries['LP21'].salesPercent,
-                        summaries['All'].salesTotalQ, 
-                        summaries['LP14'].salesTotalQ, 
-                        summaries['LP21'].salesTotalQ,  
-                        summaries['All'].salesProjectQ, 
-                        summaries['LP14'].salesProjectQ, 
-                        summaries['LP21'].salesProjectQ,  
-                        summaries['All'].salesGoalQ,  
-                        summaries['LP14'].salesGoalQ, 
-                        summaries['LP21'].salesGoalQ, 
-                        summaries['All'].salesPercentQ,
-                        summaries['LP14'].salesPercentQ,   
-                        summaries['LP21'].salesPercentQ,  
-                        summaries['All'].carsTotal,  
-                        summaries['LP14'].carsTotal, 
-                        summaries['LP21'].carsTotal, 
-                        summaries['All'].carsProject, 
-                        summaries['LP14'].carsProject, 
-                        summaries['LP21'].carsProject, 
-                        summaries['All'].carsGoal, 
-                        summaries['LP14'].carsGoal, 
-                        summaries['LP21'].carsGoal, 
-                        summaries['All'].carsPercent, 
-                        summaries['LP14'].carsPercent, 
-                        summaries['LP21'].carsPercent,
-                        summaries['All'].carsTotalQ,  
-                        summaries['LP14'].carsTotalQ, 
-                        summaries['LP21'].carsTotalQ, 
-                        summaries['All'].carsProjectQ, 
-                        summaries['LP14'].carsProjectQ, 
-                        summaries['LP21'].carsProjectQ, 
-                        summaries['All'].carsGoalQ, 
-                        summaries['LP14'].carsGoalQ, 
-                        summaries['LP21'].carsGoalQ, 
-                        summaries['All'].carsPercentQ, 
-                        summaries['LP14'].carsPercentQ, 
-                        summaries['LP21'].carsPercentQ,
-                        summaries['All'].laborTotal,  
-                        summaries['LP14'].laborTotal, 
-                        summaries['LP21'].laborTotal, 
-                        summaries['All'].laborProject, 
-                        summaries['LP14'].laborProject, 
-                        summaries['LP21'].laborProject, 
-                        summaries['All'].laborGoal, 
-                        summaries['LP14'].laborGoal, 
-                        summaries['LP21'].laborGoal, 
-                        summaries['All'].laborPercent, 
-                        summaries['LP14'].laborPercent, 
-                        summaries['LP21'].laborPercent,
-                        summaries['All'].laborTotalQ,  
-                        summaries['LP14'].laborTotalQ, 
-                        summaries['LP21'].laborTotalQ, 
-                        summaries['All'].laborProjectQ, 
-                        summaries['LP14'].laborProjectQ, 
-                        summaries['LP21'].laborProjectQ, 
-                        summaries['All'].laborGoalQ, 
-                        summaries['LP14'].laborGoalQ, 
-                        summaries['LP21'].laborGoalQ, 
-                        summaries['All'].laborPercentQ, 
-                        summaries['LP14'].laborPercentQ, 
-                        summaries['LP21'].laborPercentQ
-                    )
-
     text = MIMEText(text)
     html = MIMEText(html, 'html')
     msg.attach(text)
@@ -535,8 +452,6 @@ today = now.day
 date = dt.datetime.today().strftime("%m/%d/%Y")
 dateName = dt.datetime.today().strftime("%m-%d-%Y")
 daysIM = cd.monthrange(now.year, now.month)[1]
-
-# Quarter Variables
 month = str(now.month)
 month2 = qDict[month]['others'][0]
 month3 = qDict[month]['others'][1]
@@ -550,13 +465,6 @@ goals.set_index(['SiteID', 'Metric'], inplace=True)
 info = pd.read_csv('info.csv')
 info.set_index(['SiteID'], inplace=True)
 
-# Statwatch Login Form
-payload = {
-    'username': 'ant',
-    'password': input('Statwatch password: '),
-    'chain': 'scttaz'
-}
-
 sites = {}
 summaries = {}
 dataSheets = ['All', 'LP14', 'LP21', 'AZ', 'CA', 'NV']
@@ -566,3 +474,4 @@ if __name__=='__main__':
     start_scraping(dataSheets)
     create_workbook()   
     send_email(get_filename())
+
