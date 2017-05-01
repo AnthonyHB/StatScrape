@@ -153,7 +153,7 @@ class CarWash(object):
         # M1
         with rq.Session() as s:
             p = s.post('https://www.statwatch.com/login', data=payload)
-            newDate = str(now.month) + "/" + str(day) + "/" + str(now.year)
+            newDate = str(currMon) + "/" + str(day) + "/" + str(now.year)
             url = "https://www.statwatch.com/ajax/multi-site-table?groupID=all&compareSiteID=PREV&sort=site&sortd=asc&pc=0&activeStat=totalsales&start={}&granularity=1&todate=1&difftype=percentup&unittype=abs".format(newDate)
             r = s.get(url)
         soup = bsoup(r.content, "lxml") 
@@ -422,7 +422,7 @@ Here are the projections and goals for all locations as of {}. Please see attach
 
     test = [myEmail, myGmail]
     real = [tBarrett, aShell, mWong, mGrimes, mCollins, myEmail]
-    recipients = test
+    recipients = real
     
     msg = MIMEMultipart()
     text = MIMEText(text)
@@ -448,16 +448,27 @@ Here are the projections and goals for all locations as of {}. Please see attach
 
 # Date variables
 now = dt.datetime.now()
+currMon = now.month
 today = now.day 
+daysIM = cd.monthrange(now.year, now.month)[1]
 date = dt.datetime.today().strftime("%m/%d/%Y")
 dateName = dt.datetime.today().strftime("%m-%d-%Y")
-daysIM = cd.monthrange(now.year, now.month)[1]
-month = str(now.month)
+
+"""
+# Date Override
+currMon = 4
+today = 30
+daysIM = 30
+date = "{}/{}/{}".format(currMon, today, now.year)
+dateName = "{}-{}-{}".format(currMon, today, now.year)
+"""
+
+month = str(currMon)
 month2 = qDict[month]['others'][0]
 month3 = qDict[month]['others'][1]
 quarter = qDict[month]['quarter']
-daysIQ = cd.monthrange(now.year, now.month)[1] + cd.monthrange(now.year, month2)[1] + cd.monthrange(now.year, month3)[1]
-daysPIQ = get_daysPIQ(now.month)
+daysIQ = cd.monthrange(now.year, currMon)[1] + cd.monthrange(now.year, month2)[1] + cd.monthrange(now.year, month3)[1]
+daysPIQ = get_daysPIQ(currMon)
 
 goals = pd.read_csv('goals.csv')
 goals.set_index(['SiteID', 'Metric'], inplace=True)

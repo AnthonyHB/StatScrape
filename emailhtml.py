@@ -75,7 +75,7 @@ cskyHTML = """
                 <th style="border: 1px solid black">LP21</th>
             </tr>
             <tr style="border: 1px solid black">
-                <th style="border: 1px solid black">LP21r Count</th>
+                <th style="border: 1px solid black">Car Count</th>
                 <td style="border: 1px solid black" align="center">{All.carsTotal}</td>
                 <td style="border: 1px solid black" align="center">{LP14.carsTotal}</td>
                 <td style="border: 1px solid black" align="center">{LP21.carsTotal}</td>
@@ -107,7 +107,7 @@ cskyHTML = """
                 <th style="border: 1px solid black">LP21</th>
             </tr>
             <tr style="border: 1px solid black">
-                <th style="border: 1px solid black">LP21r Count</th>
+                <th style="border: 1px solid black">Car Count</th>
                 <td style="border: 1px solid black" align="center">{All.carsTotalQ}</td>
                 <td style="border: 1px solid black" align="center">{LP14.carsTotalQ}</td>
                 <td style="border: 1px solid black" align="center">{LP21.carsTotalQ}</td>
